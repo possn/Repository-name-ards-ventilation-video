@@ -6,26 +6,30 @@ on:
 jobs:
   render:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y ffmpeg
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
 
-    - name: Install Python packages
-      run: |
-        pip install numpy matplotlib imageio
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy matplotlib "imageio[ffmpeg]"
 
-    - name: Run render script
-      run: |
-        python render.py
+      - name: Run render script (headless)
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python render.py
+          ls -lah
 
-    - name: Upload video artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ARDS_ICU_VIDEO
-        path: ARDS_Stepwise_Long_Final_ICU.mp4
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARDS_ICU_VIDEO
+          path: "*.mp4"
+          if-no-files-found: error
